@@ -1,0 +1,143 @@
+﻿using System.Numerics;
+using CombinationGenerator.Core.Abstractions;
+using CombinationGenerator.Core.Algorithms;
+using CombinationGenerator.Core.Models;
+using CombinationGenerator.Core.Validation;
+using CombinationGenerator.Core.Exceptions;
+
+namespace CombinationGenerator.Core.Services;
+
+public class CombinationService : ICombinationService
+{
+    private readonly ICombinationSessionStore _sessionStore;
+
+    public CombinationService(ICombinationSessionStore sessionStore)
+    {
+        _sessionStore = sessionStore;
+    }
+
+    public StartCombinationResult Start(int n)
+    {
+        CombinationRequestValidator.ValidateN(n);
+
+        var session = new CombinationSession
+        {
+            N = n
+        };
+
+        _sessionStore.Save(session);
+
+        return new StartCombinationResult
+        {
+            SessionId = session.SessionId,
+            N = n,
+            TotalPermutations = FactorialCalculator.Calculate(n)
+        };
+    }
+
+    public NextCombinationResult GetNext(Guid sessionId)
+    {
+        var session = GetSessionOrThrow(sessionId);
+        var total = FactorialCalculator.Calculate(session.N);
+
+        if (session.CurrentIndex >= total)
+        {
+            return new NextCombinationResult
+            {
+                Index = session.CurrentIndex,
+                HasMore = false,
+                Message = "No more combinations."
+            };
+        }
+
+        var nextIndex = session.CurrentIndex + BigInteger.One;
+        var values = PermutationByIndexCalculator.GetByOneBasedIndex(session.N, nextIndex);
+
+        session.CurrentIndex = nextIndex;
+        session.BrowseBaseIndex = null;
+        _sessionStore.Save(session);
+
+        return new NextCombinationResult
+        {
+            Index = nextIndex,
+            Values = values,
+            HasMore = nextIndex < total
+        };
+    }
+
+    public CombinationsPageResult GetPage(Guid sessionId, int pageNumber, int pageSize)
+    {
+        CombinationRequestValidator.ValidatePage(pageNumber, pageSize);
+
+        var session = GetSessionOrThrow(sessionId);
+        var total = FactorialCalculator.Calculate(session.N);
+
+        session.BrowseBaseIndex ??= session.CurrentIndex;
+
+        var startIndex = session.BrowseBaseIndex.Value + BigInteger.One + ((pageNumber - 1) * pageSize);
+
+        var items = new List<CombinationItem>();
+
+        for (var i = 0; i < pageSize; i++)
+        {
+            var index = startIndex + i;
+
+            if (index > total)
+                break;
+
+            items.Add(new CombinationItem
+            {
+                Index = index,
+                Values = PermutationByIndexCalculator.GetByOneBasedIndex(session.N, index)
+            });
+        }
+
+        if (items.Count > 0)
+        {
+            session.CurrentIndex = items[^1].Index;
+        }
+
+        _sessionStore.Save(session);
+
+        return new CombinationsPageResult
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPermutations = total,
+            Items = items,
+            HasMore = items.Count > 0 && items[^1].Index < total
+        };
+    }
+
+    public NextCombinationResult ExitBrowse(Guid sessionId)
+    {
+        var session = GetSessionOrThrow(sessionId);
+        var total = FactorialCalculator.Calculate(session.N);
+
+        session.BrowseBaseIndex = null;
+
+        var values = session.CurrentIndex > 0
+            ? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex)
+            : [];
+
+        _sessionStore.Save(session);
+
+        return new NextCombinationResult
+        {
+            Index = session.CurrentIndex,
+            Values = values,
+            HasMore = session.CurrentIndex < total
+        };
+    }
+
+    public void Reset(Guid sessionId)
+    {
+        _sessionStore.Delete(sessionId);
+    }
+
+    private CombinationSession GetSessionOrThrow(Guid sessionId)
+    {
+        return _sessionStore.Get(sessionId)
+            ?? throw new SessionNotFoundException(sessionId);
+    }
+}

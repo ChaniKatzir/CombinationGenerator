@@ -1,3 +1,8 @@
+using CombinationGenerator.Core.Abstractions;
+using CombinationGenerator.Core.Infrastructure;
+using CombinationGenerator.Core.Services;
+using CombinationGenerator.Api.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<ICombinationSessionStore, InMemoryCombinationSessionStore>();
+builder.Services.AddScoped<ICombinationService, CombinationService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,6 +23,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

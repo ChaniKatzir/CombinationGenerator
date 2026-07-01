@@ -15,11 +15,4 @@
     <ProjectReference Include="..\CombinationGenerator.Core\CombinationGenerator.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Contracts\Requests\" />
-    <Folder Include="Contracts\Responses\" />
-    <Folder Include="Middleware\" />
-    <Folder Include="Mapping\" />
-  </ItemGroup>
-
 </Project>
