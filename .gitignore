@@ -1,0 +1,17 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# VS Code
+.vscode/
+
+# Node
+node_modules/
+
+# Logs
+*.log

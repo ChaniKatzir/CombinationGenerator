@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../CombinationGenerator.Core.Tests/CombinationGenerator.Core.Tests.csproj" />
+  <Project Path="../CombinationGenerator.Core/CombinationGenerator.Core.csproj" />
+  <Project Path="CombinationGenerator.Api.csproj" />
+</Solution>
