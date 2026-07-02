@@ -143,6 +143,25 @@ public class CombinationService : ICombinationService
         };
     }
 
+    public CombinationsPageResult ResizeBrowse(Guid sessionId, int pageSize)
+    {
+        CombinationRequestValidator.ValidatePage(BigInteger.One, pageSize);
+
+        var session = GetSessionOrThrow(sessionId);
+
+        if (session.LastBrowseStartIndex is null)
+        {
+            throw new BusinessValidationException("Browse mode has not been started.");
+        }
+
+        var browseStart = session.BrowseBaseIndex ?? session.CurrentIndex;
+
+        var offset = session.LastBrowseStartIndex.Value - browseStart;
+
+        var targetPage = (offset / pageSize) + BigInteger.One;
+
+        return GetPage(sessionId, targetPage, pageSize);
+    }
     public void Reset(Guid sessionId)
     {
         _sessionStore.Delete(sessionId);
@@ -154,29 +173,5 @@ public class CombinationService : ICombinationService
             ?? throw new SessionNotFoundException(sessionId);
     }
 
-    public CombinationsPageResult ResizeBrowse(Guid sessionId, int pageSize)
-    {
-        CombinationRequestValidator.ValidatePage(BigInteger.One, pageSize);
-
-        var session = GetSessionOrThrow(sessionId);
-
-        if (session.LastBrowseStartIndex is null)
-        {
-            throw new BusinessValidationException(
-                "Browse mode has not been started.");
-        }
-
-        var browseStart = session.BrowseBaseIndex!.Value;
-
-        var offset =
-            session.LastBrowseStartIndex.Value - browseStart;
-
-        var targetPage =
-            (offset / pageSize) + BigInteger.One;
-
-        return GetPage(
-            sessionId,
-            targetPage,
-            pageSize);
-    }
+   
 }

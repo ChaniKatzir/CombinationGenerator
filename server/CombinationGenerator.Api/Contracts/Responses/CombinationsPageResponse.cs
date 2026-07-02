@@ -2,7 +2,7 @@
 
 public class CombinationsPageResponse
 {
-    public string PageNumber { get; set; }
+    public string PageNumber { get; set; } = string.Empty;
 
     public int PageSize { get; set; }
 

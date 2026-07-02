@@ -1,5 +1,5 @@
 ﻿using CombinationGenerator.Core.Models;
-using System.Numerics;
+
 namespace CombinationGenerator.Core.Abstractions;
 
 public interface ICombinationSessionStore
@@ -9,6 +9,4 @@ public interface ICombinationSessionStore
     CombinationSession? Get(Guid sessionId);
 
     void Delete(Guid sessionId);
-
-    CombinationsPageResult ResizeBrowse(Guid sessionId, int pageSize);
 }
