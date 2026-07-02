@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
     start: '/combinations/start',
     next: '/combinations/next',
     browsePage: '/combinations/browse/page',
+    resizeBrowse: '/combinations/browse/resize',
     browseExit: '/combinations/browse/exit',
     reset: '/combinations/reset',
   },

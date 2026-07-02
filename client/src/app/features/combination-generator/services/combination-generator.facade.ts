@@ -239,41 +239,43 @@ export class CombinationGeneratorFacade {
   }
 
   changePageSize(pageSize: number): void {
+    const sessionId = this.requireSessionId();
+
+    if (!sessionId) {
+      return;
+    }
+
     if (!Number.isInteger(pageSize) || pageSize <= 0) {
       this.errorMessage.set('Invalid page size.');
       return;
     }
 
-    const browsePage = this.browsePage();
+    this.clearError();
+    this.setLoading(true);
 
-    this.pageSize.set(pageSize);
+    this.api
+      .resizeBrowsePage({
+        sessionId,
+        pageSize,
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.setLoading(false)),
+      )
+      .subscribe({
+        next: (response) => {
+          const data = this.extractData(response);
+          if (!data) {
+            return;
+          }
 
-    if (!this.isBrowseMode() || !browsePage) {
-      return;
-    }
-
-    const targetPage = this.calculateTargetPage(
-      browsePage.browseBaseIndex,
-      browsePage.startIndex,
-      pageSize,
-    );
-
-    this.loadBrowsePage(targetPage);
-  }
-
-  private calculateTargetPage(
-    browseBaseIndex: string,
-    startIndex: string,
-    pageSize: number,
-  ): number {
-
-    const offset =
-      BigInt(startIndex) - BigInt(browseBaseIndex);
-
-    const targetPage =
-      (offset / BigInt(pageSize)) + 1n;
-
-    return Number(targetPage);
+          this.browsePage.set(data);
+          this.currentPageNumber.set(Number(data.pageNumber));
+          this.pageSize.set(data.pageSize);
+          this.viewMode.set('browse');
+        },
+        error: (error) => this.setGenericError(error),
+      });
   }
 
   exitBrowse(): void {

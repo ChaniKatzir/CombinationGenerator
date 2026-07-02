@@ -9,4 +9,6 @@ public interface ICombinationSessionStore
     CombinationSession? Get(Guid sessionId);
 
     void Delete(Guid sessionId);
+
+    CombinationsPageResult ResizeBrowse(Guid sessionId, int pageSize);
 }

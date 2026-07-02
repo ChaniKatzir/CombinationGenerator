@@ -10,6 +10,7 @@ import {
   BrowsePageRequest,
   NextCombinationRequest,
   ResetCombinationRequest,
+  ResizeBrowsePageRequest,
   StartCombinationRequest,
 } from '../../features/combination-generator/models/requests';
 
@@ -70,6 +71,15 @@ export class CombinationsApiService {
   ): Observable<ApiResponse<ResetCombinationResponse>> {
     return this.http.post<ApiResponse<ResetCombinationResponse>>(
       `${this.baseUrl}${this.endpoints.reset}`,
+      request,
+    );
+  }
+
+  resizeBrowsePage(
+  request: ResizeBrowsePageRequest,
+  ): Observable<ApiResponse<BrowsePageResponse>> {
+    return this.http.post<ApiResponse<BrowsePageResponse>>(
+      `${this.baseUrl}${this.endpoints.resizeBrowse}`,
       request,
     );
   }

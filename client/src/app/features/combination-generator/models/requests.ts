@@ -12,6 +12,11 @@ export interface BrowsePageRequest {
   pageSize: number;
 }
 
+export interface ResizeBrowsePageRequest {
+  sessionId: string;
+  pageSize: number;
+}
+
 export type NextCombinationRequest = SessionRequest;
 
 export type BrowseExitRequest = SessionRequest;

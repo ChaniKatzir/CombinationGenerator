@@ -75,4 +75,20 @@ public class CombinationsController : ControllerBase
 
         return Ok(ApiResponse<bool>.Ok(true, "Session reset successfully."));
     }
+
+
+    [HttpPost("browse/resize")]
+    public ActionResult<ApiResponse<CombinationsPageResponse>> ResizeBrowse(
+        [FromBody] ResizeBrowseRequest request)
+    {
+        var result =
+            _combinationService.ResizeBrowse(
+                request.SessionId,
+                request.PageSize);
+
+        return Ok(
+            ApiResponse<CombinationsPageResponse>.Ok(
+                CombinationResponseMapper.ToResponse(result)));
+    }
+    
 }

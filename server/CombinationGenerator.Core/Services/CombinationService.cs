@@ -104,6 +104,8 @@ public class CombinationService : ICombinationService
         if (items.Count > 0)
             session.CurrentIndex = items[^1].Index;
 
+        session.LastBrowseStartIndex =items.Count > 0? items[0].Index: null;
+
         _sessionStore.Save(session);
 
         return new CombinationsPageResult
@@ -125,6 +127,7 @@ public class CombinationService : ICombinationService
         var total = FactorialCalculator.Calculate(session.N);
 
         session.BrowseBaseIndex = null;
+        session.LastBrowseStartIndex = null;
 
         var values = session.CurrentIndex > 0
             ? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex)
@@ -149,5 +152,31 @@ public class CombinationService : ICombinationService
     {
         return _sessionStore.Get(sessionId)
             ?? throw new SessionNotFoundException(sessionId);
+    }
+
+    public CombinationsPageResult ResizeBrowse(Guid sessionId, int pageSize)
+    {
+        CombinationRequestValidator.ValidatePage(BigInteger.One, pageSize);
+
+        var session = GetSessionOrThrow(sessionId);
+
+        if (session.LastBrowseStartIndex is null)
+        {
+            throw new BusinessValidationException(
+                "Browse mode has not been started.");
+        }
+
+        var browseStart = session.BrowseBaseIndex!.Value;
+
+        var offset =
+            session.LastBrowseStartIndex.Value - browseStart;
+
+        var targetPage =
+            (offset / pageSize) + BigInteger.One;
+
+        return GetPage(
+            sessionId,
+            targetPage,
+            pageSize);
     }
 }

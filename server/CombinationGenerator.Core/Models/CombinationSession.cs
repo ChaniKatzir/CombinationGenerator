@@ -15,4 +15,6 @@ public class CombinationSession
     public DateTime CreatedAtUtc { get; init; } = DateTime.UtcNow;
 
     public DateTime LastAccessedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public BigInteger? LastBrowseStartIndex { get; set; }
 }
