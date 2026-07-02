@@ -55,6 +55,7 @@ public class CombinationService : ICombinationService
 
         session.CurrentIndex = nextIndex;
         session.BrowseBaseIndex = null;
+        session.LastBrowseStartIndex = null;
         _sessionStore.Save(session);
 
         return new NextCombinationResult
@@ -128,6 +129,7 @@ public class CombinationService : ICombinationService
 
         session.BrowseBaseIndex = null;
         session.LastBrowseStartIndex = null;
+        _sessionStore.Save(session);
 
         var values = session.CurrentIndex > 0
             ? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex)
@@ -149,16 +151,15 @@ public class CombinationService : ICombinationService
 
         var session = GetSessionOrThrow(sessionId);
 
-        if (session.LastBrowseStartIndex is null)
+        if (session.LastBrowseStartIndex is null || session.BrowseBaseIndex is null)
         {
             throw new BusinessValidationException("Browse mode has not been started.");
         }
 
-        var browseStart = session.BrowseBaseIndex ?? session.CurrentIndex;
-
-        var offset = session.LastBrowseStartIndex.Value - browseStart;
+        var offset = session.LastBrowseStartIndex.Value - session.BrowseBaseIndex.Value;
 
         var targetPage = (offset / pageSize) + BigInteger.One;
+
 
         return GetPage(sessionId, targetPage, pageSize);
     }

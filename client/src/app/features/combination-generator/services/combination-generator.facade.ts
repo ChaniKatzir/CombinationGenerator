@@ -68,7 +68,7 @@ export class CombinationGeneratorFacade {
   );
 
   readonly canGoToPreviousPage = computed(
-    () => this.isBrowseMode() && this.currentPageNumber() > FIRST_PAGE && !this.isLoading(),
+    () => this.isBrowseMode() && this.currentPageNumber() > 1 && !this.isLoading(),
   );
 
   readonly canGoToNextPage = computed(
