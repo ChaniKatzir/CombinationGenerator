@@ -8,10 +8,14 @@ namespace CombinationGenerator.Api.Middleware;
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next)
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -22,14 +26,26 @@ public class ExceptionHandlingMiddleware
         }
         catch (BusinessValidationException ex)
         {
-            await WriteErrorResponseAsync(context, HttpStatusCode.BadRequest, ex.Message);
+            await WriteErrorResponseAsync(
+                context,
+                HttpStatusCode.BadRequest,
+                ex.Message);
         }
         catch (SessionNotFoundException ex)
         {
-            await WriteErrorResponseAsync(context, HttpStatusCode.NotFound, ex.Message);
+            await WriteErrorResponseAsync(
+                context,
+                HttpStatusCode.NotFound,
+                ex.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(
+                ex,
+                "Unhandled exception while processing request {Method} {Path}.",
+                context.Request.Method,
+                context.Request.Path);
+
             await WriteErrorResponseAsync(
                 context,
                 HttpStatusCode.InternalServerError,

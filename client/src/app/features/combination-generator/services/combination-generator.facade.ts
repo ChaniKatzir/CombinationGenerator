@@ -213,29 +213,19 @@ export class CombinationGeneratorFacade {
   }
 
   goToLastPage(): void {
-    const total = this.totalPermutations();
+    const page = this.browsePage();
 
-    if (!total) {
+    if (!page || this.isLoading()) {
       return;
     }
 
-    const lastPage = this.calculateLastPage(total, this.pageSize());
-    this.loadBrowsePage(lastPage);
-  }
+    const lastPage = this.calculateLastBrowsePage(
+      page.totalPermutations,
+      page.browseBaseIndex,
+      this.pageSize(),
+    );
 
-  private calculateLastPage(totalPermutations: string, pageSize: number): number {
-    const total = BigInt(totalPermutations);
-    const size = BigInt(pageSize);
-
-    const pages = total / size + (total % size === 0n ? 0n : 1n);
-
-    const maxSafePage = BigInt(Number.MAX_SAFE_INTEGER);
-
-    if (pages > maxSafePage) {
-      return Number.MAX_SAFE_INTEGER;
-    }
-
-    return Number(pages);
+    this.loadBrowsePage(Number(lastPage));
   }
 
   changePageSize(pageSize: number): void {
@@ -383,6 +373,21 @@ export class CombinationGeneratorFacade {
     this.errorMessage.set('Something went wrong. Please try again.');
   }
 
+  private calculateLastBrowsePage(
+    totalPermutations: string,
+    browseBaseIndex: string,
+    pageSize: number,
+  ): number {
+    const total = BigInt(totalPermutations);
+    const base = BigInt(browseBaseIndex);
+    const size = BigInt(pageSize);
+
+    const totalItemsInBrowse = total - base + 1n;
+    const lastPage = (totalItemsInBrowse + size - 1n) / size;
+
+    return Number(lastPage);
+  }
+  
   private clearLocalState(): void {
     this.viewMode.set('start');
     this.sessionId.set(null);
