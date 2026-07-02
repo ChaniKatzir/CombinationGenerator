@@ -30,7 +30,7 @@ public static class CombinationResponseMapper
     {
         return new CombinationsPageResponse
         {
-            PageNumber = result.PageNumber,
+            PageNumber = result.PageNumber.ToString(),
             PageSize = result.PageSize,
             TotalPermutations = result.TotalPermutations.ToString(),
             HasMore = result.HasMore,
@@ -38,7 +38,10 @@ public static class CombinationResponseMapper
             {
                 Index = item.Index.ToString(),
                 Values = item.Values
-            }).ToList()
+            }).ToList(),
+            BrowseBaseIndex = result.BrowseBaseIndex.ToString(),
+            StartIndex = result.StartIndex.ToString(),
+            EndIndex = result.EndIndex.ToString(),
         };
     }
 }

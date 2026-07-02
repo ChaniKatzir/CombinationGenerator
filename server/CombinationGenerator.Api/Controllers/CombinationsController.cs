@@ -3,6 +3,8 @@ using CombinationGenerator.Api.Contracts.Responses;
 using CombinationGenerator.Api.Mapping;
 using CombinationGenerator.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using System.Numerics;
+using CombinationGenerator.Core.Exceptions;
 
 namespace CombinationGenerator.Api.Controllers;
 
@@ -41,11 +43,14 @@ public class CombinationsController : ControllerBase
 
     [HttpPost("browse/page")]
     public ActionResult<ApiResponse<CombinationsPageResponse>> GetPage(
-        [FromBody] GetCombinationsPageRequest request)
+    [FromBody] GetCombinationsPageRequest request)
     {
+        if (!BigInteger.TryParse(request.PageNumber, out var pageNumber))
+            throw new BusinessValidationException("Page number must be a valid number.");
+
         var result = _combinationService.GetPage(
             request.SessionId,
-            request.PageNumber,
+            pageNumber,
             request.PageSize);
 
         var response = CombinationResponseMapper.ToResponse(result);

@@ -1,5 +1,5 @@
 ﻿using CombinationGenerator.Core.Models;
-
+using System.Numerics;
 namespace CombinationGenerator.Core.Abstractions;
 
 public interface ICombinationSessionStore

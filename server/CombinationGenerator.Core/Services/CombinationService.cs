@@ -65,7 +65,7 @@ public class CombinationService : ICombinationService
         };
     }
 
-    public CombinationsPageResult GetPage(Guid sessionId, int pageNumber, int pageSize)
+    public CombinationsPageResult GetPage(Guid sessionId, BigInteger pageNumber, int pageSize)
     {
         CombinationRequestValidator.ValidatePage(pageNumber, pageSize);
 
@@ -74,7 +74,16 @@ public class CombinationService : ICombinationService
 
         session.BrowseBaseIndex ??= session.CurrentIndex;
 
-        var startIndex = session.BrowseBaseIndex.Value + BigInteger.One + ((pageNumber - 1) * pageSize);
+        var remaining = total - session.BrowseBaseIndex.Value;
+        var lastPage = (remaining + pageSize - 1) / pageSize;
+
+        if (pageNumber > lastPage)
+            throw new BusinessValidationException("Page number is outside the available range.");
+
+        var startIndex =
+            session.BrowseBaseIndex.Value
+            + BigInteger.One
+            + ((pageNumber - BigInteger.One) * pageSize);
 
         var items = new List<CombinationItem>();
 
@@ -93,9 +102,7 @@ public class CombinationService : ICombinationService
         }
 
         if (items.Count > 0)
-        {
             session.CurrentIndex = items[^1].Index;
-        }
 
         _sessionStore.Save(session);
 
@@ -104,6 +111,9 @@ public class CombinationService : ICombinationService
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalPermutations = total,
+            BrowseBaseIndex = session.BrowseBaseIndex.Value,
+            StartIndex = items.Count > 0 ? items[0].Index : BigInteger.Zero,
+            EndIndex = items.Count > 0 ? items[^1].Index : BigInteger.Zero,
             Items = items,
             HasMore = items.Count > 0 && items[^1].Index < total
         };

@@ -4,7 +4,7 @@ namespace CombinationGenerator.Core.Models;
 
 public class CombinationsPageResult
 {
-    public int PageNumber { get; set; }
+    public BigInteger PageNumber { get; set; }
 
     public int PageSize { get; set; }
 
@@ -15,4 +15,8 @@ public class CombinationsPageResult
     public bool HasMore { get; set; }
 
     public string? Message { get; set; }
+
+    public BigInteger BrowseBaseIndex { get; set; }
+    public BigInteger StartIndex { get; set; }
+    public BigInteger EndIndex { get; set; }
 }

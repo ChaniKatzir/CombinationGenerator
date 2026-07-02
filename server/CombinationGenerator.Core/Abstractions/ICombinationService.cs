@@ -1,5 +1,5 @@
 ﻿using CombinationGenerator.Core.Models;
-
+using System.Numerics;
 namespace CombinationGenerator.Core.Abstractions;
 
 public interface ICombinationService
@@ -8,7 +8,7 @@ public interface ICombinationService
 
     NextCombinationResult GetNext(Guid sessionId);
 
-    CombinationsPageResult GetPage(Guid sessionId, int pageNumber, int pageSize);
+    CombinationsPageResult GetPage(Guid sessionId, BigInteger pageNumber, int pageSize);
 
     NextCombinationResult ExitBrowse(Guid sessionId);
 

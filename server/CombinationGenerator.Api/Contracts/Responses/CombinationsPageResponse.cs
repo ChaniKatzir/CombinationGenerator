@@ -2,7 +2,7 @@
 
 public class CombinationsPageResponse
 {
-    public int PageNumber { get; set; }
+    public string PageNumber { get; set; }
 
     public int PageSize { get; set; }
 
@@ -13,4 +13,10 @@ public class CombinationsPageResponse
     public bool HasMore { get; set; }
 
     public string? Message { get; set; }
+
+    public string BrowseBaseIndex { get; set; } = string.Empty;
+
+    public string StartIndex { get; set; } = string.Empty;
+
+    public string EndIndex { get; set; } = string.Empty;
 }
