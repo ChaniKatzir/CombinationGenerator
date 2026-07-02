@@ -1,7 +1,8 @@
 # Combination Generator
 
-A modular client-server application that generates permutations of numbers **without precomputing them**.
-All permutation calculations are performed exclusively on the server. The Angular client is responsible only for presentation, user interaction, and state management.
+A full-stack client/server application that generates permutations of the numbers `1..n` without precomputing or storing all possible permutations.
+
+The solution was designed according to the assignment requirements with emphasis on clean architecture, separation of responsibilities, scalability, and maintainability.
 
 ---
 
@@ -9,111 +10,145 @@ All permutation calculations are performed exclusively on the server. The Angula
 
 ## Backend
 
-* .NET 8
-* ASP.NET Core Web API
-* Dependency Injection
-* Middleware
-* Swagger
-* Modular Architecture
+- .NET 8
+- ASP.NET Core Web API
+- Dependency Injection
+- Swagger
+- Global Exception Middleware
+- xUnit
 
 ## Frontend
 
-* Angular 20
-* Standalone Components
-* Signals
-* Reactive Forms
-* HttpClient
-* RxJS
-* OnPush Change Detection
-* Angular Control Flow (`@if`, `@for`)
-* Feature-Based Architecture
+- Angular 20
+- Standalone Components
+- Signals
+- Reactive Forms
+- HttpClient
+- RxJS
+- OnPush Change Detection
+- Angular Control Flow (`@if`, `@for`)
 
 ---
 
-# Project Structure
+# Solution Structure
 
 ```
-src/app
+client/
+    Angular 20 application
 
-core
- ├── api
- ├── config
- └── interceptors
-
-shared
- ├── components
- └── models
-
-features
- └── combination-generator
-     ├── components
-     ├── models
-     ├── pages
-     └── services
+server/
+    CombinationGenerator.Api
+    CombinationGenerator.Core
+    CombinationGenerator.Core.Tests
 ```
-
-The project follows a Feature-Based Architecture in order to keep responsibilities isolated and support future scalability.
 
 ---
 
 # Architecture
 
-## API Service
+## Backend
 
-Responsible only for HTTP communication.
+The backend is divided into three projects.
 
-* No business logic
-* No UI logic
-* No application state
+### CombinationGenerator.Api
+
+Responsible only for:
+
+- HTTP endpoints
+- Request / Response contracts
+- Dependency Injection
+- Middleware
+- Swagger configuration
+- Response mapping
+
+Contains no business logic.
 
 ---
 
-## Facade
+### CombinationGenerator.Core
 
-The Facade manages the feature state.
+Contains all business logic.
 
 Responsibilities:
 
-* Signals
-* API calls
-* Loading state
-* Error state
-* Browse state
-* Session state
+- Permutation algorithms
+- Session management
+- Validation
+- Services
+- Domain models
+- Custom exceptions
 
-The Facade does **not** know anything about the UI.
-
----
-
-## Components
-
-All UI components are intentionally kept as "dumb components".
-
-Responsibilities:
-
-* Display data
-* Raise events
-
-They never:
-
-* Call HTTP
-* Store business state
-* Calculate permutations
+The Core project has no dependency on ASP.NET.
 
 ---
 
-## State Management
+### CombinationGenerator.Core.Tests
 
-Angular Signals were chosen instead of RxJS Subjects for UI state.
+Contains unit tests for:
 
-Reasons:
+- Factorial calculation
+- Permutation-by-index algorithm
+- Business logic
 
-* Simpler API
-* Better integration with Angular
-* Less boilerplate
-* Excellent performance with OnPush
+---
 
-RxJS is used only for HTTP communication.
+# Design Principles
+
+The solution follows several principles:
+
+- Separation of Concerns
+- Single Responsibility Principle
+- Dependency Inversion
+- Stateless HTTP API with server-side session state
+- Thread-safe in-memory storage
+
+The implementation intentionally avoids unnecessary complexity such as:
+
+- CQRS
+- MediatR
+- Repository pattern
+- AutoMapper
+
+These patterns were considered unnecessary for the scope of the assignment.
+
+---
+
+# State Management
+
+Each user receives a unique SessionId.
+
+The server maintains the current session state:
+
+- Current permutation
+- Current index
+- Browse state
+- Browse starting index
+
+The client stores only presentation state.
+
+---
+
+# Permutation Algorithms
+
+Two different algorithms are used.
+
+## FactorialCalculator
+
+Calculates `n!` using `BigInteger`.
+
+---
+
+## PermutationByIndexCalculator
+
+Computes any permutation directly from its index.
+
+This avoids generating all previous permutations and allows constant-memory random access.
+
+---
+
+## Lexicographic Next Permutation
+
+Used when sequential permutation generation is required.
 
 ---
 
@@ -121,44 +156,63 @@ RxJS is used only for HTTP communication.
 
 Pagination is implemented entirely on the server.
 
-The client never calculates permutation pages.
+The client requests only the required page.
 
-When the page size changes, the client keeps the user at the same logical position using the metadata returned by the server:
+For very large values of `n`, all page calculations use `BigInteger` on the server.
 
-* browseBaseIndex
-* startIndex
-* endIndex
+The API exchanges large numeric values as strings to avoid integer overflow.
 
-This avoids restarting from the first page after changing page size.
+Additional metadata is returned:
+
+- BrowseStartIndex
+- StartIndex
+- EndIndex
+
+This allows the client to preserve the current logical position when the page size changes.
 
 ---
 
 # Error Handling
 
-Backend
+## Backend
 
-* Global Exception Middleware
-* Consistent API response format
+Global Exception Middleware converts exceptions into a consistent API response format.
 
-Frontend
+Examples:
 
-* Generic HTTP Error Interceptor
-* Shared ErrorMessage component
-* Feature-specific error state managed by the Facade
+- BusinessValidationException → HTTP 400
+- SessionNotFoundException → HTTP 404
+- Unhandled Exception → HTTP 500
 
 ---
 
-# Design Decisions
+## Frontend
 
-The client intentionally avoids:
+- HTTP interceptor
+- Centralized error handling
+- Facade-managed feature state
 
-* Business calculations
-* Permutation algorithms
-* Session management logic
+---
 
-Those responsibilities belong exclusively to the backend.
+# API Overview
 
-This keeps the client lightweight while allowing future backend optimizations without changing the UI.
+```
+POST /api/combinations/start
+
+POST /api/combinations/next
+
+POST /api/combinations/browse/page
+
+POST /api/combinations/browse/exit
+
+POST /api/combinations/reset
+```
+
+Swagger is available at:
+
+```
+https://localhost:7055/swagger
+```
 
 ---
 
@@ -167,18 +221,18 @@ This keeps the client lightweight while allowing future backend optimizations wi
 ## Backend
 
 ```
+cd server
+dotnet restore
 dotnet run
 ```
 
-Swagger:
-
-```
-https://localhost:7055/swagger
-```
+---
 
 ## Frontend
 
 ```
+cd client
+
 npm install
 
 ng serve
@@ -192,8 +246,22 @@ http://localhost:4200
 
 ---
 
-# Notes
+# Key Design Decisions
 
-The solution was designed with maintainability and scalability in mind while avoiding unnecessary complexity.
+- All permutation calculations are performed on the server.
+- The client never calculates permutations.
+- Sessions are stored behind an abstraction (`ICombinationSessionStore`) allowing future replacement of the in-memory implementation with Redis without changing the business logic.
+- Large permutation indexes are represented using `BigInteger` internally and serialized as strings through the API.
+- The architecture favors simplicity and readability while remaining extensible.
 
-The architecture separates presentation, state management, and HTTP communication, making the codebase easier to extend and maintain as the project grows.
+---
+
+# Future Improvements
+
+Possible future enhancements include:
+
+- Redis-based session storage
+- Distributed caching
+- Persistent session recovery
+- Authentication
+- Monitoring and metrics
