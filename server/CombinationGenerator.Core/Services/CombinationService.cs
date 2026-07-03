@@ -105,7 +105,7 @@ public class CombinationService : ICombinationService
         if (items.Count > 0)
             session.CurrentIndex = items[^1].Index;
 
-        session.LastBrowseStartIndex =items.Count > 0? items[0].Index: null;
+        session.LastBrowseStartIndex = items.Count > 0 ? items[0].Index : null;
 
         _sessionStore.Save(session);
 
@@ -129,7 +129,6 @@ public class CombinationService : ICombinationService
 
         session.BrowseBaseIndex = null;
         session.LastBrowseStartIndex = null;
-        _sessionStore.Save(session);
 
         var values = session.CurrentIndex > 0
             ? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex)
@@ -174,5 +173,5 @@ public class CombinationService : ICombinationService
             ?? throw new SessionNotFoundException(sessionId);
     }
 
-   
+
 }
