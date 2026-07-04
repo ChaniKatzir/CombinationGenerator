@@ -24,18 +24,11 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
-        catch (BusinessValidationException ex)
+        catch (AppException ex)
         {
             await WriteErrorResponseAsync(
                 context,
-                HttpStatusCode.BadRequest,
-                ex.Message);
-        }
-        catch (SessionNotFoundException ex)
-        {
-            await WriteErrorResponseAsync(
-                context,
-                HttpStatusCode.NotFound,
+                ex.StatusCode,
                 ex.Message);
         }
         catch (Exception ex)

@@ -33,13 +33,13 @@ public static class CombinationResponseMapper
             PageNumber = result.PageNumber.ToString(),
             PageSize = result.PageSize,
             TotalPermutations = result.TotalPermutations.ToString(),
+            TotalPages = result.TotalPages.ToString(),
             HasMore = result.HasMore,
             Items = result.Items.Select(item => new CombinationItemResponse
             {
                 Index = item.Index.ToString(),
                 Values = item.Values
             }).ToList(),
-            BrowseBaseIndex = result.BrowseBaseIndex.ToString(),
             StartIndex = result.StartIndex.ToString(),
             EndIndex = result.EndIndex.ToString(),
         };

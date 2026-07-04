@@ -12,8 +12,8 @@ import { CurrentCombination } from '../../models/combination.models';
         <h2>Combination number {{ item.index }}</h2>
         <p class="values">{{ formattedValues() }}</p>
 
-        @if (!item.hasMore && item.message) {
-          <p class="message">{{ item.message }}</p>
+        @if (!item.hasMore) {
+          <p class="message">No more combinations.</p>
         }
       </section>
     } @else {

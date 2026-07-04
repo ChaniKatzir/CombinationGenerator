@@ -13,15 +13,14 @@ export interface BrowsePageResponse {
   pageSize: number;
 
   totalPermutations: string;
+  totalPages: string;
 
-  browseBaseIndex: string;
   startIndex: string;
   endIndex: string;
 
   items: Combination[];
 
   hasMore: boolean;
-  message: string;
 }
 
 export type BrowseExitResponse = CurrentCombination;

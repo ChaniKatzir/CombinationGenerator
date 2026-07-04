@@ -114,7 +114,7 @@ public class CombinationService : ICombinationService
             PageNumber = pageNumber,
             PageSize = pageSize,
             TotalPermutations = total,
-            BrowseBaseIndex = session.BrowseBaseIndex.Value,
+            TotalPages = lastPage,
             StartIndex = items.Count > 0 ? items[0].Index : BigInteger.Zero,
             EndIndex = items.Count > 0 ? items[^1].Index : BigInteger.Zero,
             Items = items,

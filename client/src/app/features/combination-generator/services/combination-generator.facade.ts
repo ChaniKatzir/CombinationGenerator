@@ -4,18 +4,20 @@ import { finalize } from 'rxjs';
 
 import { CombinationsApiService } from '../../../core/api/combinations-api.service';
 import { ApiResponse } from '../../../shared/models/api-response.model';
-import { CurrentCombination } from '../models/combination.models';
+import {
+  CurrentCombination,
+  DEFAULT_PAGE_SIZE,
+  FIRST_PAGE,
+  MAX_N,
+  MIN_N,
+  ViewMode,
+} from '../models/combination.models';
 import {
   BrowsePageResponse,
   StartCombinationResponse,
 } from '../models/responses';
 
-type ViewMode = 'start' | 'single' | 'browse';
-
-const MIN_N = 1;
-const MAX_N = 20;
-const DEFAULT_PAGE_SIZE = 5;
-const FIRST_PAGE = '1';
+const FIRST_PAGE_AS_STRING = String(FIRST_PAGE);
 
 @Injectable()
 export class CombinationGeneratorFacade {
@@ -32,10 +34,11 @@ export class CombinationGeneratorFacade {
   readonly browsePage = signal<BrowsePageResponse | null>(null);
 
   readonly pageSize = signal<number>(DEFAULT_PAGE_SIZE);
-  readonly currentPageNumber = signal<string>(FIRST_PAGE);
+  readonly currentPageNumber = signal<string>(FIRST_PAGE_AS_STRING);
 
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly infoMessage = signal<string | null>(null);
 
   readonly hasSession = computed(() => this.sessionId() !== null);
 
@@ -71,7 +74,7 @@ export class CombinationGeneratorFacade {
     () =>
       this.isBrowseMode() &&
       this.isValidPositiveInteger(this.currentPageNumber()) &&
-      BigInt(this.currentPageNumber()) > 1n &&
+      BigInt(this.currentPageNumber()) > BigInt(FIRST_PAGE) &&
       !this.isLoading(),
   );
 
@@ -82,8 +85,15 @@ export class CombinationGeneratorFacade {
       !this.isLoading(),
   );
 
+  readonly canGoToLastPage = computed(
+    () =>
+      this.isBrowseMode() &&
+      !!this.browsePage() &&
+      !this.isLoading(),
+  );
+
   start(n: number): void {
-    this.clearError();
+    this.clearMessages();
 
     if (!this.isValidN(n)) {
       this.errorMessage.set(`Please enter a number between ${MIN_N} and ${MAX_N}.`);
@@ -110,7 +120,7 @@ export class CombinationGeneratorFacade {
           this.totalPermutations.set(data.totalPermutations);
           this.currentCombination.set(null);
           this.browsePage.set(null);
-          this.currentPageNumber.set(FIRST_PAGE);
+          this.currentPageNumber.set(FIRST_PAGE_AS_STRING);
           this.viewMode.set('single');
         },
         error: (error) => this.setGenericError(error),
@@ -123,7 +133,7 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    this.clearError();
+    this.clearMessages();
     this.setLoading(true);
 
     this.api
@@ -141,11 +151,11 @@ export class CombinationGeneratorFacade {
 
           this.currentCombination.set(data);
           this.browsePage.set(null);
-          this.currentPageNumber.set(FIRST_PAGE);
+          this.currentPageNumber.set(FIRST_PAGE_AS_STRING);
           this.viewMode.set('single');
 
-          if (!data.hasMore && data.message) {
-            this.errorMessage.set(data.message);
+          if (!data.hasMore) {
+            this.infoMessage.set('No more combinations.');
           }
         },
         error: (error) => this.setGenericError(error),
@@ -153,7 +163,7 @@ export class CombinationGeneratorFacade {
   }
 
   enterBrowse(): void {
-    this.loadBrowsePage(FIRST_PAGE);
+    this.loadBrowsePage(FIRST_PAGE_AS_STRING);
   }
 
   loadBrowsePage(pageNumber: string | number | bigint): void {
@@ -169,7 +179,7 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    this.clearError();
+    this.clearMessages();
     this.setLoading(true);
 
     this.api
@@ -194,8 +204,8 @@ export class CombinationGeneratorFacade {
           this.currentPageNumber.set(data.pageNumber);
           this.viewMode.set('browse');
 
-          if (!data.hasMore && data.message) {
-            this.errorMessage.set(data.message);
+          if (!data.hasMore) {
+            this.infoMessage.set('No more combinations to display.');
           }
         },
         error: (error) => this.setGenericError(error),
@@ -221,7 +231,7 @@ export class CombinationGeneratorFacade {
   }
 
   goToFirstPage(): void {
-    this.loadBrowsePage(FIRST_PAGE);
+    this.loadBrowsePage(FIRST_PAGE_AS_STRING);
   }
 
   goToLastPage(): void {
@@ -231,13 +241,7 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    const lastPage = this.calculateLastBrowsePage(
-      page.totalPermutations,
-      page.browseBaseIndex,
-      page.pageSize,
-    );
-
-    this.loadBrowsePage(lastPage);
+    this.loadBrowsePage(page.totalPages);
   }
 
   goToPage(pageNumber: string | number): void {
@@ -256,7 +260,7 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    this.clearError();
+    this.clearMessages();
     this.setLoading(true);
 
     this.api
@@ -279,6 +283,10 @@ export class CombinationGeneratorFacade {
           this.currentPageNumber.set(data.pageNumber);
           this.pageSize.set(data.pageSize);
           this.viewMode.set('browse');
+
+          if (!data.hasMore) {
+            this.infoMessage.set('No more combinations to display.');
+          }
         },
         error: (error) => this.setGenericError(error),
       });
@@ -290,7 +298,7 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    this.clearError();
+    this.clearMessages();
     this.setLoading(true);
 
     this.api
@@ -308,8 +316,12 @@ export class CombinationGeneratorFacade {
 
           this.currentCombination.set(data);
           this.browsePage.set(null);
-          this.currentPageNumber.set(FIRST_PAGE);
+          this.currentPageNumber.set(FIRST_PAGE_AS_STRING);
           this.viewMode.set('single');
+
+          if (!data.hasMore) {
+            this.infoMessage.set('No more combinations.');
+          }
         },
         error: (error) => this.setGenericError(error),
       });
@@ -323,7 +335,7 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    this.clearError();
+    this.clearMessages();
     this.setLoading(true);
 
     this.api
@@ -347,6 +359,10 @@ export class CombinationGeneratorFacade {
 
   clearError(): void {
     this.errorMessage.set(null);
+  }
+
+  clearInfo(): void {
+    this.infoMessage.set(null);
   }
 
   private extractData<T>(response: ApiResponse<T>): T | null {
@@ -377,6 +393,11 @@ export class CombinationGeneratorFacade {
     this.isLoading.set(value);
   }
 
+  private clearMessages(): void {
+    this.errorMessage.set(null);
+    this.infoMessage.set(null);
+  }
+
   private setGenericError(error?: unknown): void {
     if (
       typeof error === 'object' &&
@@ -404,26 +425,6 @@ export class CombinationGeneratorFacade {
     return /^[1-9]\d*$/.test(value);
   }
 
-  private calculateLastBrowsePage(
-    totalPermutations: string,
-    browseBaseIndex: string,
-    pageSize: number,
-  ): string {
-    const total = BigInt(totalPermutations);
-    const base = BigInt(browseBaseIndex);
-    const size = BigInt(pageSize);
-
-    const totalItemsInBrowse = total - base;
-
-    if (totalItemsInBrowse <= 0n) {
-      return FIRST_PAGE;
-    }
-
-    const lastPage = (totalItemsInBrowse + size - 1n) / size;
-
-    return lastPage.toString();
-  }
-
   private clearLocalState(): void {
     this.viewMode.set('start');
     this.sessionId.set(null);
@@ -431,8 +432,9 @@ export class CombinationGeneratorFacade {
     this.totalPermutations.set(null);
     this.currentCombination.set(null);
     this.browsePage.set(null);
-    this.currentPageNumber.set(FIRST_PAGE);
+    this.currentPageNumber.set(FIRST_PAGE_AS_STRING);
     this.pageSize.set(DEFAULT_PAGE_SIZE);
     this.errorMessage.set(null);
+    this.infoMessage.set(null);
   }
 }

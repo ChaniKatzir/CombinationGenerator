@@ -40,6 +40,5 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 export class ErrorMessageComponent {
   readonly message = input<string | null>(null);
   readonly dismissible = input<boolean>(true);
-
   readonly dismiss = output<void>();
 }

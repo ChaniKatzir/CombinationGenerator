@@ -41,8 +41,8 @@ import { BrowsePageResponse } from '../../models/responses';
           <p>No combinations to display.</p>
         }
 
-        @if (!currentPage.hasMore && currentPage.message) {
-          <p class="message">{{ currentPage.message }}</p>
+        @if (!currentPage.hasMore) {
+          <p class="message">No more combinations to display.</p>
         }
       </section>
     }
