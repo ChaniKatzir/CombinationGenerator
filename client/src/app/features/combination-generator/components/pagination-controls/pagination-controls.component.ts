@@ -21,8 +21,8 @@ import { FormsModule } from '@angular/forms';
       <label>
         Go to page
         <input
-          type="number"
-          min="0"
+          type="text"
+          min="1"
           [disabled]="isLoading()"
           [(ngModel)]="requestedPage"
         />
@@ -98,7 +98,7 @@ import { FormsModule } from '@angular/forms';
   `],
 })
 export class PaginationControlsComponent {
-  readonly currentPageNumber = input<number>(0);
+  readonly currentPageNumber = input<string>('1');
   readonly canGoToPreviousPage = input<boolean>(false);
   readonly canGoToNextPage = input<boolean>(false);
   readonly isLoading = input<boolean>(false);
@@ -109,21 +109,20 @@ export class PaginationControlsComponent {
   readonly goToPrevious = output<void>();
   readonly goToNext = output<void>();
   readonly goToLast = output<void>();
-  readonly goToPage = output<number>();
+  readonly goToPage = output<string>();
   readonly pageSizeChange = output<number>();
 
-  requestedPage: number | null = null;
+  requestedPage: string = '';
 
   goToRequestedPage(): void {
-    const pageNumber = Number(this.requestedPage);
+    const value = this.requestedPage.trim();
 
-    if (!Number.isInteger(pageNumber) || pageNumber < 0) {
+    if (!/^[1-9]\d*$/.test(value)) {
       return;
     }
 
-    this.goToPage.emit(pageNumber);
+    this.goToPage.emit(value);
   }
-
   onPageSizeChange(event: Event): void {
     const value = Number((event.target as HTMLSelectElement).value);
     this.pageSizeChange.emit(value);
