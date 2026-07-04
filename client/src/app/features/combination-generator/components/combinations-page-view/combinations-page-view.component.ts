@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-
+import { formatLargeNumber } from '../../../../shared/utils/format-large-number';
 import { BrowsePageResponse } from '../../models/responses';
 
 @Component({
@@ -30,7 +30,7 @@ import { BrowsePageResponse } from '../../models/responses';
               <tbody>
                 @for (item of currentPage.items; track item.index) {
                   <tr>
-                    <td>{{ item.index }}</td>
+                    <td>{{ formatLargeNumber(item.index) }}</td>
                     <td>[{{ item.values.join(', ') }}]</td>
                   </tr>
                 }
@@ -99,4 +99,7 @@ import { BrowsePageResponse } from '../../models/responses';
 })
 export class CombinationsPageViewComponent {
   readonly page = input<BrowsePageResponse | null>(null);
+  
+  
+  readonly formatLargeNumber = formatLargeNumber;
 }

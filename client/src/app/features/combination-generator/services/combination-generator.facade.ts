@@ -14,8 +14,8 @@ import {
 } from '../models/combination.models';
 import {
   BrowsePageResponse,
-  StartCombinationResponse,
 } from '../models/responses';
+import { formatLargeNumber } from '../../../shared/utils/format-large-number';
 
 const FIRST_PAGE_AS_STRING = String(FIRST_PAGE);
 
@@ -29,7 +29,9 @@ export class CombinationGeneratorFacade {
   readonly sessionId = signal<string | null>(null);
   readonly n = signal<number | null>(null);
   readonly totalPermutations = signal<string | null>(null);
-
+  readonly formattedTotalPermutations = computed(() =>
+    formatLargeNumber(this.totalPermutations()),
+  );
   readonly currentCombination = signal<CurrentCombination | null>(null);
   readonly browsePage = signal<BrowsePageResponse | null>(null);
 

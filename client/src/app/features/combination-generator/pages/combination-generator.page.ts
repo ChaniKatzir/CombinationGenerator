@@ -49,7 +49,7 @@ import { CombinationGeneratorFacade } from '../services/combination-generator.fa
       @if (facade.isSingleMode()) {
         <section class="summary">
           <p><strong>n:</strong> {{ facade.n() }}</p>
-          <p><strong>Total permutations:</strong> {{ facade.totalPermutations() }}</p>
+          <p><strong>Total permutations:</strong> {{ facade.formattedTotalPermutations() }}</p>
         </section>
 
         <app-action-toolbar
@@ -69,7 +69,7 @@ import { CombinationGeneratorFacade } from '../services/combination-generator.fa
       @if (facade.isBrowseMode()) {
         <section class="summary">
           <p><strong>n:</strong> {{ facade.n() }}</p>
-          <p><strong>Total permutations:</strong> {{ facade.totalPermutations() }}</p>
+          <p><strong>Total permutations:</strong> {{ facade.formattedTotalPermutations() }}</p>
         </section>
 
         <app-combinations-page-view

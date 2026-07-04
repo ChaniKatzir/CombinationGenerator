@@ -10,6 +10,8 @@ public class CombinationSession
 
     public BigInteger CurrentIndex { get; set; } = BigInteger.Zero;
 
+    public int[]? CurrentValues { get; set; }   
+
     public BigInteger? BrowseBaseIndex { get; set; }
 
     public DateTime CreatedAtUtc { get; init; } = DateTime.UtcNow;

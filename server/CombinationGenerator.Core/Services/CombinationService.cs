@@ -45,17 +45,31 @@ public class CombinationService : ICombinationService
             return new NextCombinationResult
             {
                 Index = session.CurrentIndex,
-                HasMore = false,
-                Message = "No more combinations."
+                HasMore = false
             };
         }
 
+        int[] values;
+
+        if (session.CurrentIndex == BigInteger.Zero)
+        {
+            values = Enumerable.Range(1, session.N).ToArray();
+        }
+        else
+        {
+            var currentValues = session.CurrentValues
+                ?? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex);
+
+            values = LexicographicNextPermutationGenerator.GetNext(currentValues);
+        }
+
         var nextIndex = session.CurrentIndex + BigInteger.One;
-        var values = PermutationByIndexCalculator.GetByOneBasedIndex(session.N, nextIndex);
 
         session.CurrentIndex = nextIndex;
+        session.CurrentValues = values;
         session.BrowseBaseIndex = null;
         session.LastBrowseStartIndex = null;
+
         _sessionStore.Save(session);
 
         return new NextCombinationResult
@@ -103,7 +117,10 @@ public class CombinationService : ICombinationService
         }
 
         if (items.Count > 0)
+        {
             session.CurrentIndex = items[^1].Index;
+            session.CurrentValues = items[^1].Values;
+        }
 
         session.LastBrowseStartIndex = items.Count > 0 ? items[0].Index : null;
 
@@ -131,7 +148,8 @@ public class CombinationService : ICombinationService
         session.LastBrowseStartIndex = null;
 
         var values = session.CurrentIndex > 0
-            ? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex)
+            ? session.CurrentValues
+              ?? PermutationByIndexCalculator.GetByOneBasedIndex(session.N, session.CurrentIndex)
             : [];
 
         _sessionStore.Save(session);
