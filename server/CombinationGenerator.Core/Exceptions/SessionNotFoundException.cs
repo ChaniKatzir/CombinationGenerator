@@ -1,9 +1,13 @@
-﻿namespace CombinationGenerator.Core.Exceptions;
+﻿using System.Net;
 
-public class SessionNotFoundException : Exception
+namespace CombinationGenerator.Core.Exceptions;
+
+public class SessionNotFoundException : AppException
 {
     public SessionNotFoundException(Guid sessionId)
-        : base($"Session '{sessionId}' was not found.")
+        : base(
+            $"Session '{sessionId}' was not found.",
+            HttpStatusCode.NotFound)
     {
     }
 }

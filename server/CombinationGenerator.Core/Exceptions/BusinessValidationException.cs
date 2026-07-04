@@ -1,9 +1,11 @@
-﻿namespace CombinationGenerator.Core.Exceptions;
+﻿using System.Net;
 
-public class BusinessValidationException : Exception
+namespace CombinationGenerator.Core.Exceptions;
+
+public class BusinessValidationException : AppException
 {
     public BusinessValidationException(string message)
-        : base(message)
+        : base(message, HttpStatusCode.BadRequest)
     {
     }
 }
