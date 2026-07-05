@@ -110,16 +110,14 @@ describe('CombinationGeneratorFacade', () => {
         message: '',
         data: createBrowsePageResponse({
           pageNumber: '1',
-          pageSize: 10,
-          totalPermutations: '6',
-          browseBaseIndex: '1',
+          pageSize: 5,
+          totalPermutations: '120',
+          totalPages: '24',
           startIndex: '1',
-          endIndex: '6',
-          items: [
-            { index: '1', values: [1, 2, 3] },
-            { index: '2', values: [1, 3, 2] },
-          ],
-          hasMore: false,
+          endIndex: '5',
+          items: [{ index: '1', values: [1, 2, 3] }],
+          hasMore: true,
+
         }),
       }),
     );
@@ -129,13 +127,13 @@ describe('CombinationGeneratorFacade', () => {
     expect(api.getBrowsePage).toHaveBeenCalledWith({
       sessionId: 'session-1',
       pageNumber: '1',
-      pageSize: 10,
+      pageSize: 5,
     });
 
     expect(facade.isBrowseMode()).toBe(true);
-    expect(facade.currentPageNumber()).toBe(1);
-    expect(facade.pageSize()).toBe(10);
-    expect(facade.browsePage()?.items.length).toBe(2);
+    expect(facade.currentPageNumber()).toBe('1');
+    expect(facade.pageSize()).toBe(5);
+    expect(facade.browsePage()?.items.length).toBe(1);
   });
 
   it('should resize browse page through the backend', () => {
@@ -151,7 +149,7 @@ describe('CombinationGeneratorFacade', () => {
           pageNumber: '3',
           pageSize: 5,
           totalPermutations: '120',
-          browseBaseIndex: '1',
+          totalPages: '24',
           startIndex: '11',
           endIndex: '15',
           items: [{ index: '11', values: [1, 2, 3, 4, 5] }],
@@ -167,7 +165,7 @@ describe('CombinationGeneratorFacade', () => {
       pageSize: 5,
     });
 
-    expect(facade.currentPageNumber()).toBe(3);
+    expect(facade.currentPageNumber()).toBe('3');
     expect(facade.pageSize()).toBe(5);
     expect(facade.browsePage()?.startIndex).toBe('11');
   });
@@ -185,7 +183,7 @@ describe('CombinationGeneratorFacade', () => {
           pageNumber: '2',
           pageSize: 10,
           totalPermutations: '120',
-          browseBaseIndex: '1',
+          totalPages: '24',
           startIndex: '11',
           endIndex: '20',
           items: [{ index: '11', values: [1, 2, 3] }],
@@ -303,7 +301,7 @@ describe('CombinationGeneratorFacade', () => {
           pageNumber,
           pageSize: 10,
           totalPermutations: '120',
-          browseBaseIndex: '1',
+          totalPages: '24',
           startIndex: '1',
           endIndex: '10',
           items: [{ index: '1', values: [1, 2, 3] }],
@@ -319,16 +317,72 @@ describe('CombinationGeneratorFacade', () => {
     pageNumber: string;
     pageSize: number;
     totalPermutations: string;
-    browseBaseIndex: string;
+    totalPages: string;
     startIndex: string;
     endIndex: string;
     items: { index: string; values: number[] }[];
     hasMore: boolean;
-    message?: string;
   }) {
-    return {
-      ...overrides,
-      message: overrides.message ?? '',
-    };
+    return overrides;
   }
+  
+  it('should not call API when requested page is greater than total pages', () => {
+  startSession();
+  loadInitialBrowsePage('1');
+
+  api.getBrowsePage.mockClear();
+
+  facade.goToPage('25');
+
+  expect(api.getBrowsePage).not.toHaveBeenCalled();
+  expect(facade.errorMessage()).toBe('Page number must be between 1 and 24.');
+});
+
+it('should not enter browse when current combination has no more items', () => {
+  startSession();
+
+  facade.currentCombination.set({
+    index: '120',
+    values: [5, 4, 3, 2, 1],
+    hasMore: false,
+  });
+
+  api.getBrowsePage.mockClear();
+
+  facade.enterBrowse();
+
+  expect(api.getBrowsePage).not.toHaveBeenCalled();
+  expect(facade.infoMessage()).toBe('No more combinations to display.');
+});
+
+it('should not get next when current combination has no more items', () => {
+  startSession();
+
+  facade.currentCombination.set({
+    index: '120',
+    values: [5, 4, 3, 2, 1],
+    hasMore: false,
+  });
+
+  api.getNext.mockClear();
+
+  facade.getNext();
+
+  expect(api.getNext).not.toHaveBeenCalled();
+});
+
+it('should go to last page using totalPages from backend', () => {
+  startSession();
+  loadInitialBrowsePage('1');
+
+  api.getBrowsePage.mockClear();
+
+  facade.goToLastPage();
+
+  expect(api.getBrowsePage).toHaveBeenCalledWith({
+    sessionId: 'session-1',
+    pageNumber: '24',
+    pageSize: 10,
+  });
+});
 });

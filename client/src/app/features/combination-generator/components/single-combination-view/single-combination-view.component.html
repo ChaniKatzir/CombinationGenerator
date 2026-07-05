@@ -3,9 +3,9 @@
         <h2>Combination number {{ item.index }}</h2>
         <p class="values">{{ formattedValues() }}</p>
 
-        @if (!item.hasMore) {
-          <p class="message">No more combinations.</p>
-        }
+       @if (item.message) {
+  <p class="message">{{ item.message }}</p>
+}
       </section>
     } @else {
       <section class="empty">

@@ -5,6 +5,7 @@ export interface Combination {
 
 export interface CurrentCombination extends Combination {
   hasMore: boolean;
+  message?: string | null;
 }
 
 export type ViewMode = 'start' | 'single' | 'browse';

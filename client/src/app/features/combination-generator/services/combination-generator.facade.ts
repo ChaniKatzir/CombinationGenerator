@@ -167,9 +167,9 @@ export class CombinationGeneratorFacade {
           this.currentPageNumber.set(FIRST_PAGE_AS_STRING);
           this.viewMode.set('single');
 
-          if (!data.hasMore) {
-            this.infoMessage.set('No more combinations.');
-          }
+         if (data.message) {
+  this.infoMessage.set(data.message);
+}
         },
         error: (error) => this.setGenericError(error),
       });
@@ -224,12 +224,6 @@ export class CombinationGeneratorFacade {
           this.currentPageNumber.set(data.pageNumber);
           this.viewMode.set('browse');
 
-          console.log('VIEW MODE', this.viewMode());
-console.log('BROWSE PAGE', data);
-
-          if (!data.hasMore) {
-            this.infoMessage.set('No more combinations to display.');
-          }
         },
         error: (error) => this.setGenericError(error),
       });
@@ -268,25 +262,25 @@ console.log('BROWSE PAGE', data);
   }
 
   goToPage(pageNumber: string | number | bigint): void {
-    const validation = ValidationUtils.validatePageNumber(
-      pageNumber,
-      this.browsePage()?.totalPages,
-    );
+  const validation = ValidationUtils.validatePageNumber(
+    pageNumber,
+    this.browsePage()?.totalPages,
+  );
 
-    if (!validation.isValid) {
-      this.errorMessage.set(validation.message);
-      return;
-    }
-
-    const normalizedPageNumber = ValidationUtils.normalizePageNumber(pageNumber);
-
-    if (!normalizedPageNumber) {
-      this.errorMessage.set('Please enter a valid page number.');
-      return;
-    }
-
-    this.loadBrowsePage(normalizedPageNumber);
+  if (!validation.isValid) {
+    this.errorMessage.set(validation.message);
+    return;
   }
+
+  const normalizedPageNumber = ValidationUtils.normalizePageNumber(pageNumber);
+
+  if (!normalizedPageNumber) {
+    this.errorMessage.set('Please enter a valid page number.');
+    return;
+  }
+
+  this.loadBrowsePage(normalizedPageNumber);
+}
 
   changePageSize(pageSize: number): void {
     const sessionId = this.requireSessionId();
@@ -325,9 +319,6 @@ console.log('BROWSE PAGE', data);
           this.pageSize.set(data.pageSize);
           this.viewMode.set('browse');
 
-          if (!data.hasMore) {
-            this.infoMessage.set('No more combinations to display.');
-          }
         },
         error: (error) => this.setGenericError(error),
       });
@@ -360,9 +351,9 @@ console.log('BROWSE PAGE', data);
           this.currentPageNumber.set(FIRST_PAGE_AS_STRING);
           this.viewMode.set('single');
 
-          if (!data.hasMore) {
-            this.infoMessage.set('No more combinations.');
-          }
+          if (data.message) {
+  this.infoMessage.set(data.message);
+}
         },
         error: (error) => this.setGenericError(error),
       });
