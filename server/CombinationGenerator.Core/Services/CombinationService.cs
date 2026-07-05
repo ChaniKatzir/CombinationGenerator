@@ -45,7 +45,9 @@ public class CombinationService : ICombinationService
             return new NextCombinationResult
             {
                 Index = session.CurrentIndex,
-                HasMore = false
+                Values = session.CurrentValues ?? [],
+                HasMore = false,
+                Message = "No more combinations."
             };
         }
 
@@ -76,7 +78,8 @@ public class CombinationService : ICombinationService
         {
             Index = nextIndex,
             Values = values,
-            HasMore = nextIndex < total
+            HasMore = nextIndex < total,
+            Message = nextIndex < total ? null : "No more combinations."
         };
     }
 

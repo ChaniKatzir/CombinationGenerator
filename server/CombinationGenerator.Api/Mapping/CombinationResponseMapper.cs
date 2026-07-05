@@ -42,6 +42,7 @@ public static class CombinationResponseMapper
             }).ToList(),
             StartIndex = result.StartIndex.ToString(),
             EndIndex = result.EndIndex.ToString(),
+            Message = result.Message
         };
     }
 }
