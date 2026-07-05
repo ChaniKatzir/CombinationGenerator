@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { formatLargeNumber } from '../../../../shared/utils/format-large-number';
 
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 
@@ -19,6 +20,7 @@ export class PaginationControlsComponent {
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
   readonly pageSizeOptions = input<number[]>([5, 10, 20, 50]);
+  protected readonly formatLargeNumber = formatLargeNumber;
 
   readonly goToFirst = output<void>();
   readonly goToPrevious = output<void>();

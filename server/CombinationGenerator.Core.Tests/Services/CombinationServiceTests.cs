@@ -157,4 +157,38 @@ public class CombinationServiceTests
         Assert.Throws<BusinessValidationException>(() =>
             service.ResizeBrowse(start.SessionId, 10));
     }
+
+    [Fact]
+    public void GetPage_WhenPageContainsMultipleItems_ReturnsSequentialPermutations()
+    {
+        var service = CreateService();
+        var start = service.Start(3);
+
+        var page = service.GetPage(start.SessionId, 1, 10);
+
+        Assert.Equal(6, page.Items.Count);
+
+        Assert.Equal([1, 2, 3], page.Items[0].Values);
+        Assert.Equal([1, 3, 2], page.Items[1].Values);
+        Assert.Equal([2, 1, 3], page.Items[2].Values);
+        Assert.Equal([2, 3, 1], page.Items[3].Values);
+        Assert.Equal([3, 1, 2], page.Items[4].Values);
+        Assert.Equal([3, 2, 1], page.Items[5].Values);
+
+        Assert.False(page.HasMore);
+    }
+
+    [Fact]
+    public void GetPage_WhenPageEndsAtLastPermutation_DoesNotThrow()
+    {
+        var service = CreateService();
+        var start = service.Start(3);
+
+        var page = service.GetPage(start.SessionId, 1, 10);
+
+        Assert.Equal(6, page.Items.Count);
+        Assert.Equal("6", page.Items[^1].Index.ToString());
+        Assert.Equal([3, 2, 1], page.Items[^1].Values);
+        Assert.False(page.HasMore);
+    }
 }

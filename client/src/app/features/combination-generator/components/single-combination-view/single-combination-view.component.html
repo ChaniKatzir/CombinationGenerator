@@ -1,6 +1,6 @@
 @if (combination(); as item) {
       <section class="card">
-        <h2>Combination number {{ item.index }}</h2>
+        <h2>Combination number {{ formatLargeNumber(item.index) }}</h2>
         <p class="values">{{ formattedValues() }}</p>
 
        @if (item.message) {

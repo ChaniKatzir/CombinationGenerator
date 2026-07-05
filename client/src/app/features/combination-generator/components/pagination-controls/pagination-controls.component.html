@@ -15,10 +15,10 @@
     Previous
   </button>
 
-  <span>Current page: {{ currentPageNumber() }}</span>
+  <span>Current page: {{formatLargeNumber(currentPageNumber()) }}</span>
 
   @if (totalPages()) {
-    <span>of {{ totalPages() }}</span>
+    <span>of {{ formatLargeNumber(totalPages()) }}</span>
   }
 
   <label>

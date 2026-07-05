@@ -105,18 +105,36 @@ public class CombinationService : ICombinationService
 
         var items = new List<CombinationItem>();
 
-        for (var i = 0; i < pageSize; i++)
+        if (startIndex <= total)
         {
-            var index = startIndex + i;
-
-            if (index > total)
-                break;
+            var currentValues = PermutationByIndexCalculator.GetByOneBasedIndex(
+                session.N,
+                startIndex);
 
             items.Add(new CombinationItem
             {
-                Index = index,
-                Values = PermutationByIndexCalculator.GetByOneBasedIndex(session.N, index)
+                Index = startIndex,
+                Values = currentValues
             });
+
+            for (var i = 1; i < pageSize; i++)
+            {
+                var index = startIndex + i;
+
+                if (index > total)
+                    break;
+
+                currentValues = LexicographicNextPermutationGenerator.GetNext(currentValues);
+
+                if (currentValues.Length == 0)
+                    break;
+
+                items.Add(new CombinationItem
+                {
+                    Index = index,
+                    Values = currentValues
+                });
+            }
         }
 
         if (items.Count > 0)
