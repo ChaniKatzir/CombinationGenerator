@@ -56,17 +56,21 @@ export class CombinationGeneratorFacade {
     () => (this.browsePage()?.items.length ?? 0) > 0,
   );
 
-  readonly canGetNext = computed(
-    () => this.hasSession() && !this.isLoading(),
-  );
+  readonly canGetNext = computed(() =>
+  this.hasSession() &&
+  !this.isLoading() &&
+  (this.currentCombination()?.hasMore ?? true)
+);
 
   readonly canReset = computed(
     () => this.hasSession() && !this.isLoading(),
   );
 
-  readonly canEnterBrowse = computed(
-    () => this.hasSession() && !this.isLoading(),
-  );
+  readonly canEnterBrowse = computed(() =>
+  this.hasSession() &&
+  !this.isLoading() &&
+  (this.currentCombination()?.hasMore ?? true)
+);
 
   readonly canExitBrowse = computed(
     () => this.isBrowseMode() && this.hasSession() && !this.isLoading(),
@@ -130,7 +134,11 @@ export class CombinationGeneratorFacade {
   }
 
   getNext(): void {
-    const sessionId = this.requireSessionId();
+    if (!this.canGetNext()) {
+    return;
+  }
+
+  const sessionId = this.requireSessionId();
     if (!sessionId) {
       return;
     }
@@ -166,6 +174,11 @@ export class CombinationGeneratorFacade {
   }
 
   enterBrowse(): void {
+    if (!this.canEnterBrowse()) {
+      this.infoMessage.set('No more combinations to display.');
+      return;
+    }
+
     this.loadBrowsePage(FIRST_PAGE_AS_STRING);
   }
 
