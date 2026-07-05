@@ -34,3 +34,9 @@
     input {
       width: 8rem;
     }
+
+    .validation-message {
+        margin: 0;
+        color: #b00020;
+        font-size: 0.9rem;
+        }

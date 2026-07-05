@@ -1,7 +1,7 @@
 import { DestroyRef, computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-
+import { ValidationUtils } from '../../../shared/utils/validation.utils';
 import { CombinationsApiService } from '../../../core/api/combinations-api.service';
 import { ApiResponse } from '../../../shared/models/api-response.model';
 import {
@@ -101,8 +101,10 @@ export class CombinationGeneratorFacade {
   start(n: number): void {
     this.clearMessages();
 
-    if (!this.isValidN(n)) {
-      this.errorMessage.set(`Please enter a number between ${MIN_N} and ${MAX_N}.`);
+    const validation = ValidationUtils.validateN(n, MIN_N, MAX_N);
+
+    if (!validation.isValid) {
+      this.errorMessage.set(validation.message);
       return;
     }
 
@@ -189,10 +191,10 @@ export class CombinationGeneratorFacade {
       return;
     }
 
-    const normalizedPageNumber = this.normalizePageNumber(pageNumber);
+    const normalizedPageNumber = ValidationUtils.normalizePageNumber(pageNumber);
 
     if (!normalizedPageNumber) {
-      this.errorMessage.set('Invalid page number.');
+      this.errorMessage.set('Please enter a valid page number.');
       return;
     }
 
@@ -265,8 +267,25 @@ console.log('BROWSE PAGE', data);
     this.loadBrowsePage(page.totalPages);
   }
 
-  goToPage(pageNumber: string | number): void {
-    this.loadBrowsePage(pageNumber);
+  goToPage(pageNumber: string | number | bigint): void {
+    const validation = ValidationUtils.validatePageNumber(
+      pageNumber,
+      this.browsePage()?.totalPages,
+    );
+
+    if (!validation.isValid) {
+      this.errorMessage.set(validation.message);
+      return;
+    }
+
+    const normalizedPageNumber = ValidationUtils.normalizePageNumber(pageNumber);
+
+    if (!normalizedPageNumber) {
+      this.errorMessage.set('Please enter a valid page number.');
+      return;
+    }
+
+    this.loadBrowsePage(normalizedPageNumber);
   }
 
   changePageSize(pageSize: number): void {
@@ -275,9 +294,10 @@ console.log('BROWSE PAGE', data);
     if (!sessionId) {
       return;
     }
+    const validation = ValidationUtils.validatePageSize(pageSize);
 
-    if (!Number.isInteger(pageSize) || pageSize <= 0) {
-      this.errorMessage.set('Invalid page size.');
+    if (!validation.isValid) {
+      this.errorMessage.set(validation.message);
       return;
     }
 
@@ -458,4 +478,6 @@ console.log('BROWSE PAGE', data);
     this.errorMessage.set(null);
     this.infoMessage.set(null);
   }
+
+  
 }
