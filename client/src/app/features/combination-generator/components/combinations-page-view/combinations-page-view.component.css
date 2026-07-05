@@ -1,47 +1,48 @@
-.page-card {
-      display: grid;
-      gap: 1rem;
-      padding: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 0.75rem;
-      background: #fff;
-    }
+.page-card,
+.empty {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.75rem;
+  background: #fff;
+}
 
-    header {
-      display: grid;
-      gap: 0.25rem;
-    }
+header {
+  display: grid;
+  gap: 0.25rem;
+}
 
-    h2,
-    p {
-      margin: 0;
-    }
+h2,
+p {
+  margin: 0;
+}
 
-    .table-wrapper {
-      overflow-x: auto;
-    }
+.table-wrapper {
+  overflow-x: auto;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-    th,
-    td {
-      padding: 0.6rem;
-      border-bottom: 1px solid #eee;
-      text-align: left;
-    }
+th,
+td {
+  padding: 0.6rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
 
-    th {
-      font-weight: 700;
-      background: #f7f7f7;
-    }
+th {
+  font-weight: 700;
+  background: #f7f7f7;
+}
 
-    td:last-child {
-      font-family: monospace;
-    }
+td:last-child {
+  font-family: monospace;
+}
 
-    .message {
-      color: #555;
-    }
+.message {
+  color: #555;
+}

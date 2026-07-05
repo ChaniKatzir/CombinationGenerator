@@ -9,7 +9,9 @@
         (dismiss)="facade.clearError()"
       />
 
-      <app-loading-spinner [isLoading]="facade.isLoading()" />
+    @if (facade.isLoading()) {
+    <app-loading-spinner />
+    }
 
       @if (facade.isStartMode()) {
         <app-start-form
@@ -45,13 +47,14 @@
         </section>
 
         <app-combinations-page-view
-          [page]="facade.browsePage()"
-        />
+          [page]="facade.browsePage()"/>   
+
 
         <app-pagination-controls
           [currentPageNumber]="facade.currentPageNumber()"
           [canGoToPreviousPage]="facade.canGoToPreviousPage()"
           [canGoToNextPage]="facade.canGoToNextPage()"
+          [totalPages]="facade.browsePage()?.totalPages ?? null"
           [isLoading]="facade.isLoading()"
           [pageSize]="facade.pageSize()"
           (goToFirst)="facade.goToFirstPage()"

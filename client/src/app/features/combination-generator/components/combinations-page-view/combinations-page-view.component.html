@@ -1,37 +1,30 @@
-<section class="page-card">
-        <header>
-          <h2>Browse combinations</h2>
-          <p>
-            Page {{ currentPage.pageNumber }},
-            page size {{ currentPage.pageSize }}
-          </p>
-        </header>
+@if (page(); as currentPage) {
+  <section class="page-card">
+    <h2>Browse combinations</h2>
 
-        @if (currentPage.items.length > 0) {
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Number</th>
-                  <th>Combination</th>
-                </tr>
-              </thead>
+    <p>
+      Page {{ formatLargeNumber(currentPage.pageNumber) }} of {{ formatLargeNumber(currentPage.totalPages) }},
+      page size {{ currentPage.pageSize }}
+    </p>
 
-              <tbody>
-                @for (item of currentPage.items; track item.index) {
-                  <tr>
-                    <td>{{ formatLargeNumber(item.index) }}</td>
-                    <td>[{{ item.values.join(', ') }}]</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        } @else {
-          <p>No combinations to display.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Combination</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of currentPage.items; track item.index) {
+          <tr>
+            <td>{{ formatLargeNumber(item.index) }}</td>
+            <td>[{{ item.values.join(', ') }}]</td>
+          </tr>
         }
-
-        @if (!currentPage.hasMore) {
-          <p class="message">No more combinations to display.</p>
-        }
-      </section>
+      </tbody>
+    </table>
+  </section>
+} @else {
+  <p>No browse page loaded yet.</p>
+}

@@ -15,6 +15,7 @@ export class PaginationControlsComponent {
   readonly currentPageNumber = input<string>('1');
   readonly canGoToPreviousPage = input<boolean>(false);
   readonly canGoToNextPage = input<boolean>(false);
+  readonly totalPages = input<string | null>(null);
   readonly isLoading = input<boolean>(false);
   readonly pageSize = input<number>(10);
   readonly pageSizeOptions = input<number[]>([5, 10, 20, 50]);

@@ -147,6 +147,7 @@ export class CombinationGeneratorFacade {
       .subscribe({
         next: (response) => {
           const data = this.extractData(response);
+          
           if (!data) {
             return;
           }
@@ -170,6 +171,7 @@ export class CombinationGeneratorFacade {
 
   loadBrowsePage(pageNumber: string | number | bigint): void {
     const sessionId = this.requireSessionId();
+
     if (!sessionId) {
       return;
     }
@@ -191,12 +193,13 @@ export class CombinationGeneratorFacade {
         pageSize: this.pageSize(),
       })
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
         finalize(() => this.setLoading(false)),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
           const data = this.extractData(response);
+
           if (!data) {
             return;
           }
@@ -205,6 +208,9 @@ export class CombinationGeneratorFacade {
           this.pageSize.set(data.pageSize);
           this.currentPageNumber.set(data.pageNumber);
           this.viewMode.set('browse');
+
+          console.log('VIEW MODE', this.viewMode());
+console.log('BROWSE PAGE', data);
 
           if (!data.hasMore) {
             this.infoMessage.set('No more combinations to display.');
