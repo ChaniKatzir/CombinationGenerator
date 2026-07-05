@@ -1,0 +1,19 @@
+ <form class="start-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label for="n">Enter n</label>
+
+      <input
+        id="n"
+        type="text"
+        inputmode="numeric"
+        formControlName="n"
+        placeholder="Number between 1 and 20"
+      />
+
+      @if (validationMessage()) {
+        <p class="validation-error">{{ validationMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isLoading()">
+        Start
+      </button>
+    </form>

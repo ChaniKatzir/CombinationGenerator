@@ -1,0 +1,9 @@
+@if (message()) {
+      <section class="error" role="alert">
+        <span>{{ message() }}</span>
+
+        @if (dismissible()) {
+          <button type="button" (click)="dismiss.emit()">×</button>
+        }
+      </section>
+    }

@@ -1,102 +1,16 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   selector: 'app-pagination-controls',
   standalone: true,
   imports: [FormsModule],
+  templateUrl: './pagination-controls.component.html',
+  styleUrl: './pagination-controls.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <nav class="pagination" aria-label="Pagination">
-      <button type="button" [disabled]="!canGoToPreviousPage()" (click)="goToFirst.emit()">
-        First
-      </button>
+}) 
 
-      <button type="button" [disabled]="!canGoToPreviousPage()" (click)="goToPrevious.emit()">
-        Previous
-      </button>
-
-      <span>Current page: {{ currentPageNumber() }}</span>
-
-      <label>
-        Go to page
-        <input
-          type="text"
-          min="1"
-          [disabled]="isLoading()"
-          [(ngModel)]="requestedPage"
-        />
-      </label>
-
-      <button
-        type="button"
-        [disabled]="isLoading() || requestedPage === null"
-        (click)="goToRequestedPage()"
-      >
-        Go
-      </button>
-
-      <button type="button" [disabled]="!canGoToNextPage()" (click)="goToNext.emit()">
-        Next
-      </button>
-
-      <button type="button" [disabled]="isLoading()" (click)="goToLast.emit()">
-        Last
-      </button>
-
-      <label>
-        Page size
-        <select
-          [value]="pageSize()"
-          [disabled]="isLoading()"
-          (change)="onPageSizeChange($event)"
-        >
-          @for (size of pageSizeOptions(); track size) {
-            <option [value]="size">{{ size }}</option>
-          }
-        </select>
-      </label>
-    </nav>
-  `,
-  styles: [`
-    .pagination {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    button,
-    input,
-    select {
-      padding: 0.5rem 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 0.5rem;
-      background: #fff;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    button:disabled,
-    input:disabled,
-    select:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    label {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    input {
-      width: 8rem;
-    }
-  `],
-})
 export class PaginationControlsComponent {
   readonly currentPageNumber = input<string>('1');
   readonly canGoToPreviousPage = input<boolean>(false);

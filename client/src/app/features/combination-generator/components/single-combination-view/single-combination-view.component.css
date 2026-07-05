@@ -1,0 +1,23 @@
+.card,
+    .empty {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 0.75rem;
+      background: #fff;
+    }
+
+    h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .values {
+      margin: 0;
+      font-family: monospace;
+      font-size: 1.1rem;
+    }
+
+    .message {
+      margin: 0.75rem 0 0;
+      color: #555;
+    }

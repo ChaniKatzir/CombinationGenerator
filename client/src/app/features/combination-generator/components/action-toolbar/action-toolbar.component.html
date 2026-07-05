@@ -1,0 +1,13 @@
+<div class="toolbar">
+      <button type="button" [disabled]="!canGetNext()" (click)="getNext.emit()">
+        Next
+      </button>
+
+      <button type="button" [disabled]="!canEnterBrowse()" (click)="enterBrowse.emit()">
+        Browse combinations
+      </button>
+
+      <button type="button" [disabled]="!canReset()" (click)="reset.emit()">
+        Reset
+      </button>
+    </div>

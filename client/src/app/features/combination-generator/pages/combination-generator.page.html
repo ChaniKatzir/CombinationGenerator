@@ -1,0 +1,83 @@
+<main class="page">
+      <header class="header">
+        <h1>Combination Generator</h1>
+        <p>Generate permutations from the server without pre-calculating them on the client.</p>
+      </header>
+
+      <app-error-message
+        [message]="facade.errorMessage()"
+        (dismiss)="facade.clearError()"
+      />
+
+      <app-loading-spinner [isLoading]="facade.isLoading()" />
+
+      @if (facade.isStartMode()) {
+        <app-start-form
+          [isLoading]="facade.isLoading()"
+          (startRequested)="facade.start($event)"
+        />
+      }
+
+      @if (facade.isSingleMode()) {
+        <section class="summary">
+          <p><strong>n:</strong> {{ facade.n() }}</p>
+          <p><strong>Total permutations:</strong> {{ facade.formattedTotalPermutations() }}</p>
+        </section>
+
+        <app-action-toolbar
+          [canGetNext]="facade.canGetNext()"
+          [canEnterBrowse]="facade.canEnterBrowse()"
+          [canReset]="facade.canReset()"
+          (getNext)="facade.getNext()"
+          (enterBrowse)="facade.enterBrowse()"
+          (reset)="facade.reset()"
+        />
+
+        <app-single-combination-view
+          [combination]="facade.currentCombination()"
+        />
+      }
+
+      @if (facade.isBrowseMode()) {
+        <section class="summary">
+          <p><strong>n:</strong> {{ facade.n() }}</p>
+          <p><strong>Total permutations:</strong> {{ facade.formattedTotalPermutations() }}</p>
+        </section>
+
+        <app-combinations-page-view
+          [page]="facade.browsePage()"
+        />
+
+        <app-pagination-controls
+          [currentPageNumber]="facade.currentPageNumber()"
+          [canGoToPreviousPage]="facade.canGoToPreviousPage()"
+          [canGoToNextPage]="facade.canGoToNextPage()"
+          [isLoading]="facade.isLoading()"
+          [pageSize]="facade.pageSize()"
+          (goToFirst)="facade.goToFirstPage()"
+          (goToPrevious)="facade.goToPreviousPage()"
+          (goToNext)="facade.goToNextPage()"
+          (goToPage)="facade.loadBrowsePage($event)"
+          (pageSizeChange)="facade.changePageSize($event)"
+          (goToLast)="facade.goToLastPage()" 
+        />
+
+        <div class="browse-actions">
+          <button
+            type="button"
+            [disabled]="!facade.canExitBrowse()"
+            (click)="facade.exitBrowse()"
+          >
+            Back
+          </button>
+
+          <button
+            type="button"
+            [disabled]="!facade.canReset()"
+            (click)="facade.reset()"
+          >
+            Reset
+          </button>
+        </div>
+      }
+    </main>

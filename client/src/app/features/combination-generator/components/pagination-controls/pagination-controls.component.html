@@ -1,0 +1,50 @@
+<nav class="pagination" aria-label="Pagination">
+      <button type="button" [disabled]="!canGoToPreviousPage()" (click)="goToFirst.emit()">
+        First
+      </button>
+
+      <button type="button" [disabled]="!canGoToPreviousPage()" (click)="goToPrevious.emit()">
+        Previous
+      </button>
+
+      <span>Current page: {{ currentPageNumber() }}</span>
+
+      <label>
+        Go to page
+        <input
+          type="text"
+          min="1"
+          [disabled]="isLoading()"
+          [(ngModel)]="requestedPage"
+        />
+      </label>
+
+      <button
+        type="button"
+        [disabled]="isLoading() || requestedPage === null"
+        (click)="goToRequestedPage()"
+      >
+        Go
+      </button>
+
+      <button type="button" [disabled]="!canGoToNextPage()" (click)="goToNext.emit()">
+        Next
+      </button>
+
+      <button type="button" [disabled]="isLoading()" (click)="goToLast.emit()">
+        Last
+      </button>
+
+      <label>
+        Page size
+        <select
+          [value]="pageSize()"
+          [disabled]="isLoading()"
+          (change)="onPageSizeChange($event)"
+        >
+          @for (size of pageSizeOptions(); track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </label>
+    </nav>

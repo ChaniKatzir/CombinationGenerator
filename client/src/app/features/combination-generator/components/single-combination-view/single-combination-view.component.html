@@ -1,0 +1,14 @@
+@if (combination(); as item) {
+      <section class="card">
+        <h2>Combination number {{ item.index }}</h2>
+        <p class="values">{{ formattedValues() }}</p>
+
+        @if (!item.hasMore) {
+          <p class="message">No more combinations.</p>
+        }
+      </section>
+    } @else {
+      <section class="empty">
+        <p>Click Next to display the first combination.</p>
+      </section>
+    }
